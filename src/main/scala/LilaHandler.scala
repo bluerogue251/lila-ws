@@ -125,7 +125,10 @@ final class LilaHandler(
       case RoundVersion(gameId, version, flags, tpe, data) =>
         val versioned = ClientIn.RoundVersioned(version, flags, tpe, data)
         History.round.add(gameId, versioned)
-        publish(_ room gameId, versioned)
+        // Simulate the 6th ply of the game not being delivered to clients due to network partition
+        if (!data.value.contains("\"ply\":6")) {
+          publish(_ room gameId, versioned)
+        }
         if (tpe == "move" || tpe == "drop") Fens.move(gameId, data)
       case TellRoom(roomId, payload) => publish(_ room roomId, ClientIn.Payload(payload))
       case RoundResyncPlayer(fullId) =>

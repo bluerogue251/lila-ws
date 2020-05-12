@@ -114,7 +114,13 @@ object RoundClientActor {
 
           case ClientOut.RoundMove(uci, blur, lag, ackId) =>
             fullId foreach { fid =>
-              clientIn(ClientIn.Ack(ackId))
+              /*
+               * Simulate a network partition to cause the client to retry sending certain messages.
+               * The client's retries will result in it sending duplicate and/or out-of-order messages.
+               */
+              if (!uci.uci.equals("g8f6")) {
+                clientIn(ClientIn.Ack(ackId))
+              }
               lilaIn.round(LilaIn.RoundMove(fid, uci, blur, lag))
             }
             Behaviors.same
