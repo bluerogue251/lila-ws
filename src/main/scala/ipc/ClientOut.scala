@@ -176,7 +176,8 @@ object ClientOut {
                 move <- d str "u" flatMap Uci.Move.apply orElse parseOldMove(d)
                 blur  = d int "b" contains 1
                 ackId = d int "a"
-              } yield RoundMove(move, blur, parseLag(d), ackId, d int "p")
+                ply = d int "p"
+              } yield RoundMove(move, blur, parseLag(d), ackId, ply)
             case "drop" =>
               for {
                 d    <- o obj "d"
@@ -185,7 +186,8 @@ object ClientOut {
                 drop <- Uci.Drop.fromStrings(role, pos)
                 blur  = d int "b" contains 1
                 ackId = d int "a"
-              } yield RoundMove(drop, blur, parseLag(d), ackId, d int "p")
+                ply = d int "p"
+              } yield RoundMove(drop, blur, parseLag(d), ackId, ply)
             case "hold" =>
               for {
                 d    <- o obj "d"
