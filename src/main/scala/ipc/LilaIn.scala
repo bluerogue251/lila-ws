@@ -102,10 +102,11 @@ object LilaIn {
     def write = s"r/do $fullId ${Json.stringify(payload)}"
   }
 
-  case class RoundMove(fullId: Game.FullId, uci: Uci, blur: Boolean, lag: MoveMetrics) extends Round {
+  case class RoundMove(fullId: Game.FullId, uci: Uci, blur: Boolean, lag: MoveMetrics, ply: Option[Int]) extends Round {
     private def centis(c: Option[Centis]) = optional(c.map(_.centis.toString))
+    private val movePly = optional(ply.map(_.toString))
     def write =
-      s"r/move $fullId ${uci.uci} ${boolean(blur)} ${centis(lag.clientLag)} ${centis(lag.clientMoveTime)}"
+      s"r/move $fullId ${uci.uci} ${boolean(blur)} ${centis(lag.clientLag)} ${centis(lag.clientMoveTime)} $movePly"
     override def critical = true
   }
 

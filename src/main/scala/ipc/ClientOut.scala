@@ -81,13 +81,13 @@ object ClientOut {
 
   // round
 
-  case class RoundPlayerForward(payload: JsValue)                                     extends ClientOutRound
-  case class RoundMove(uci: Uci, blur: Boolean, lag: MoveMetrics, ackId: Option[Int]) extends ClientOutRound
-  case class RoundHold(mean: Int, sd: Int)                                            extends ClientOutRound
-  case class RoundBerserk(ackId: Option[Int])                                         extends ClientOutRound
-  case class RoundSelfReport(name: String)                                            extends ClientOutRound
-  case class RoundFlag(color: Color)                                                  extends ClientOutRound
-  case object RoundBye                                                                extends ClientOutRound
+  case class RoundPlayerForward(payload: JsValue)                                                       extends ClientOutRound
+  case class RoundMove(uci: Uci, blur: Boolean, lag: MoveMetrics, ackId: Option[Int], ply: Option[Int]) extends ClientOutRound
+  case class RoundHold(mean: Int, sd: Int)                                                              extends ClientOutRound
+  case class RoundBerserk(ackId: Option[Int])                                                           extends ClientOutRound
+  case class RoundSelfReport(name: String)                                                              extends ClientOutRound
+  case class RoundFlag(color: Color)                                                                    extends ClientOutRound
+  case object RoundBye                                                                                  extends ClientOutRound
 
   // chat
 
@@ -176,7 +176,7 @@ object ClientOut {
                 move <- d str "u" flatMap Uci.Move.apply orElse parseOldMove(d)
                 blur  = d int "b" contains 1
                 ackId = d int "a"
-              } yield RoundMove(move, blur, parseLag(d), ackId)
+              } yield RoundMove(move, blur, parseLag(d), ackId, d int "p")
             case "drop" =>
               for {
                 d    <- o obj "d"
@@ -185,7 +185,7 @@ object ClientOut {
                 drop <- Uci.Drop.fromStrings(role, pos)
                 blur  = d int "b" contains 1
                 ackId = d int "a"
-              } yield RoundMove(drop, blur, parseLag(d), ackId)
+              } yield RoundMove(drop, blur, parseLag(d), ackId, d int "p")
             case "hold" =>
               for {
                 d    <- o obj "d"
