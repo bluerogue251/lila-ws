@@ -4,6 +4,7 @@ package ipc
 import chess.format.{ FEN, Uci }
 import chess.variant.Variant
 import chess.{ Centis, Color, MoveMetrics, Pos }
+import lila.ws.Game.Ply
 import play.api.libs.json._
 import scala.util.{ Success, Try }
 
@@ -82,7 +83,7 @@ object ClientOut {
   // round
 
   case class RoundPlayerForward(payload: JsValue)                                                       extends ClientOutRound
-  case class RoundMove(uci: Uci, blur: Boolean, lag: MoveMetrics, ackId: Option[Int], ply: Option[Int]) extends ClientOutRound
+  case class RoundMove(uci: Uci, blur: Boolean, lag: MoveMetrics, ackId: Option[Int], ply: Option[Ply]) extends ClientOutRound
   case class RoundHold(mean: Int, sd: Int)                                                              extends ClientOutRound
   case class RoundBerserk(ackId: Option[Int])                                                           extends ClientOutRound
   case class RoundSelfReport(name: String)                                                              extends ClientOutRound
@@ -176,7 +177,7 @@ object ClientOut {
                 move <- d str "u" flatMap Uci.Move.apply orElse parseOldMove(d)
                 blur  = d int "b" contains 1
                 ackId = d int "a"
-                ply = d int "p"
+                ply = d int "p" map Ply
               } yield RoundMove(move, blur, parseLag(d), ackId, ply)
             case "drop" =>
               for {
@@ -186,7 +187,7 @@ object ClientOut {
                 drop <- Uci.Drop.fromStrings(role, pos)
                 blur  = d int "b" contains 1
                 ackId = d int "a"
-                ply = d int "p"
+                ply = d int "p" map Ply
               } yield RoundMove(drop, blur, parseLag(d), ackId, ply)
             case "hold" =>
               for {

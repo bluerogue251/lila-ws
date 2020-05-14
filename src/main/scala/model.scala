@@ -54,6 +54,8 @@ object Game {
     case class Swiss(id: String) extends RoundExt
     case class Simul(id: String) extends RoundExt
   }
+
+  case class Ply(value: Int)
 }
 
 object Simul {
